@@ -8,7 +8,7 @@ from rest_framework import status
 from rest_framework.decorators import action
 from rest_framework.response import Response
 import uuid
-from .tasks import send_payment_confirmation_email
+from .tasks import send_payment_confirmation_email, send_booking_confirmation_email
 from django.conf import settings
 
 CHAPA_API_URL = settings.CHAPA_API_URL
@@ -22,6 +22,25 @@ class ListingViewSet(viewsets.ModelViewSet):
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    
+    def create(self, request, *args, **kwargs):
+        """Override create method to send booking confirmation email"""
+        response = super().create(request, *args, **kwargs)
+        
+        if response.status_code == 201:
+            booking_data = response.data
+            booking = Booking.objects.get(pk=booking_data['booking_id'])
+            
+            # Trigger booking confirmation email task
+            send_booking_confirmation_email.delay(
+                user_email=booking.user.email,
+                booking_id=str(booking.booking_id),
+                listing_title=booking.listing.title,
+                start_date=str(booking.start_date),
+                end_date=str(booking.end_date)
+            )
+            
+        return response
 
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()

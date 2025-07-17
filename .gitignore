@@ -14,3 +14,9 @@ alx_travel_app/listings/__pycache__/
 alx_travel_app/listings/migrations/__pycache__/
 alx_travel_app/listings/migrations/__init__.py:Zone.Identifier
 *.pyc
+CELERY_SETUP_SUMMARY.py
+alx_travel_app/email_settings_console.py
+setup_celery_rabbitmq.sh
+alx_travel_app/test_celery_integration.py
+test_email_sync.py
+test_celery_tasks.py

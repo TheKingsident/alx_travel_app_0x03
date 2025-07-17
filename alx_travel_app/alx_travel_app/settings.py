@@ -14,17 +14,16 @@ from pathlib import Path
 import environ
 import os
 
+# Build paths inside the project like this: BASE_DIR / 'subdir'.
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Environment variables setup
 env = environ.Env(
     DEBUG=(bool, False)
 )
 
-environ.Env.read_env()
-DEBUG = env('DEBUG')
-
-
-# Build paths inside the project like this: BASE_DIR / 'subdir'.
-BASE_DIR = Path(__file__).resolve().parent.parent
-
+# Read environment variables from .env file
+environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
@@ -37,17 +36,36 @@ DEBUG = env('DEBUG')
 
 DATABASES = {
     'default': {
-        'ENGINE': env('DB_ENGINE'),
-        'NAME': env('DB_NAME'),
-        'USER': env('DB_USER'),
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),
-        'PORT': env('DB_PORT'),
+        'ENGINE': env('DB_ENGINE', default='django.db.backends.sqlite3'),
+        'NAME': env('DB_NAME', default=BASE_DIR / 'db.sqlite3'),
+        'USER': env('DB_USER', default=''),
+        'PASSWORD': env('DB_PASSWORD', default=''),
+        'HOST': env('DB_HOST', default=''),
+        'PORT': env('DB_PORT', default=''),
     }
 }
 
-CELERY_BROKER_URL = 'redis://localhost:6379/0'
+# Celery Configuration with RabbitMQ
+CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
 CELERY_RESULT_BACKEND = 'django-db'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+CELERY_TIMEZONE = 'UTC'
+
+# Email Configuration for Zoho
+EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
+EMAIL_HOST = 'smtp.zoho.com'
+EMAIL_PORT = 587
+EMAIL_USE_TLS = True
+EMAIL_HOST_USER = env('EMAIL_HOST_USER')  # Read from .env file
+EMAIL_HOST_PASSWORD = env('EMAIL_HOST_PASSWORD', default='your_zoho_app_password')
+DEFAULT_FROM_EMAIL = env('EMAIL_HOST_USER')  # Use the same email as host user
+
+# Chapa Payment Configuration
+CHAPA_API_URL = env('CHAPA_API_URL')
+CHAPA_VERIFY_URL = env('CHAPA_VERIFY_URL')
+CHAPA_SECRET_KEY = env('CHAPA_SECRET_KEY')
 
 ALLOWED_HOSTS = []
 
@@ -99,17 +117,6 @@ TEMPLATES = [
 WSGI_APPLICATION = 'alx_travel_app.wsgi.application'
 
 
-# Database
-# https://docs.djangoproject.com/en/5.2/ref/settings/#databases
-
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
-    }
-}
-
-
 # Password validation
 # https://docs.djangoproject.com/en/5.2/ref/settings/#auth-password-validators
 
@@ -155,13 +162,3 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 
 AUTH_USER_MODEL = 'listings.User'
-
-import environ
-import os
-
-env = environ.Env()
-environ.Env.read_env(os.path.join(BASE_DIR, '.env'))
-
-CHAPA_API_URL = env('CHAPA_API_URL')
-CHAPA_VERIFY_URL = env('CHAPA_VERIFY_URL')
-CHAPA_SECRET_KEY = env('CHAPA_SECRET_KEY')
