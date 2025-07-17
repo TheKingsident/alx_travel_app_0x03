@@ -20,3 +20,4 @@ setup_celery_rabbitmq.sh
 alx_travel_app/test_celery_integration.py
 test_email_sync.py
 test_celery_tasks.py
+CV_Work_Experience_Entry.md
