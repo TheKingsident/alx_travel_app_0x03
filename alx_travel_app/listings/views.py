@@ -76,7 +76,7 @@ class PaymentViewSet(viewsets.ModelViewSet):
             "first_name": booking.user.first_name,
             "last_name": booking.user.last_name,
             "tx_ref": str(uuid.uuid4()),
-            "return_url": "https://yourdomain.com/payment/verify/",
+            "return_url": "https://www.kingsleyusa.dev",
         }
         headers = {"Authorization": f"Bearer {CHAPA_SECRET_KEY}"}
         chapa_response = requests.post(CHAPA_API_URL, json=data, headers=headers)
