@@ -48,15 +48,19 @@ class BookingViewSet(viewsets.ModelViewSet):
             booking_data = response.data
             booking = Booking.objects.get(pk=booking_data['booking_id'])
             
-            # Trigger booking confirmation email task
-            send_booking_confirmation_email.delay(
-                user_email=booking.user.email,
-                booking_id=str(booking.booking_id),
-                listing_title=booking.listing.title,
-                start_date=str(booking.start_date),
-                end_date=str(booking.end_date)
-            )
-            
+            # Trigger booking confirmation email task (if Celery is available)
+            try:
+                send_booking_confirmation_email.delay(
+                    user_email=booking.user.email,
+                    booking_id=str(booking.booking_id),
+                    listing_title=booking.listing.title,
+                    start_date=str(booking.start_date),
+                    end_date=str(booking.end_date)
+                )
+            except Exception as e:
+                # Log the error but don't fail the booking creation
+                print(f"Email task failed: {e}")
+                
         return response
 
 class PaymentViewSet(viewsets.ModelViewSet):
@@ -108,7 +112,10 @@ class PaymentViewSet(viewsets.ModelViewSet):
         if verify_response.status_code == 200 and verify_data.get("status") == "success":
             payment.status = "Completed"
             payment.save()
-            send_payment_confirmation_email.delay(payment.booking.user.email, payment.booking.id)
+            try:
+                send_payment_confirmation_email.delay(payment.booking.user.email, payment.booking.id)
+            except Exception as e:
+                print(f"Payment email task failed: {e}")
             return Response({"status": "Payment completed"})
         else:
             payment.status = "Failed"

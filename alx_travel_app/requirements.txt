@@ -12,6 +12,7 @@ psycopg2-binary>=2.9,<3.0
 # Celery for background tasks
 celery>=5.0,<6.0
 django-celery-results>=2.5,<3.0
+redis>=4.0,<6.0
 
 # Web server for production
 gunicorn>=21.0,<22.0

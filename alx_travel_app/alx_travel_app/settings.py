@@ -104,9 +104,16 @@ DATABASES = {
     }
 }
 
-# Celery Configuration (unchanged)
-CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
-CELERY_RESULT_BACKEND = 'django-db'
+# Celery Configuration (environment-dependent)
+if DEBUG:
+    # Development: Use RabbitMQ
+    CELERY_BROKER_URL = 'amqp://guest:guest@localhost:5672//'
+    CELERY_RESULT_BACKEND = 'django-db'
+else:
+    # Production: Use Redis
+    CELERY_BROKER_URL = 'redis://localhost:6379/0'
+    CELERY_RESULT_BACKEND = 'redis://localhost:6379/0'
+
 CELERY_ACCEPT_CONTENT = ['json']
 CELERY_TASK_SERIALIZER = 'json'
 CELERY_RESULT_SERIALIZER = 'json'
