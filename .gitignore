@@ -21,3 +21,12 @@ alx_travel_app/test_celery_integration.py
 test_email_sync.py
 test_celery_tasks.py
 CV_Work_Experience_Entry.md
+bwh_server.pem
+deploy_django.sh
+AWS_Deployment_Guide.md
+AWS_FREE_TIER_SETUP.sh
+DEPLOYMENT_INSTRUCTIONS.md
+ec2_setup.sh
+FREE_TIER_MONITOR.sh
+setup_services.sh
+alx_travel_app/.env.production
