@@ -23,9 +23,9 @@ def api_root(request):
         'message': 'Welcome to ALX Travel App API',
         'version': 'v1',
         'endpoints': {
-            'listings': request.build_absolute_uri('/api/v1/listings/'),
-            'bookings': request.build_absolute_uri('/api/v1/bookings/'),
-            'payments': request.build_absolute_uri('/api/v1/payments/'),
+            'listings': request.build_absolute_uri('v1/listings/'),
+            'bookings': request.build_absolute_uri('v1/bookings/'),
+            'payments': request.build_absolute_uri('v1/payments/'),
             'documentation': request.build_absolute_uri('/swagger/'),
         }
     })
