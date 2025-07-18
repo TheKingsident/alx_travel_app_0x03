@@ -1,12 +1,13 @@
 from django.shortcuts import render
-from rest_framework import viewsets
+from rest_framework import viewsets, permissions
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
 from .models import Listing, Booking, Payment
 from .serializers import ListingSerializer, BookingSerializer, PaymentSerializer
 from django.http import JsonResponse
 import requests
 from rest_framework import status
 from rest_framework.decorators import action
-from rest_framework.response import Response
 import uuid
 from .tasks import send_payment_confirmation_email, send_booking_confirmation_email
 from django.conf import settings
@@ -15,13 +16,29 @@ CHAPA_API_URL = settings.CHAPA_API_URL
 CHAPA_VERIFY_URL = settings.CHAPA_VERIFY_URL
 CHAPA_SECRET_KEY = settings.CHAPA_SECRET_KEY
 
+@api_view(['GET'])
+def api_root(request):
+    """API root endpoint"""
+    return Response({
+        'message': 'Welcome to ALX Travel App API',
+        'version': 'v1',
+        'endpoints': {
+            'listings': request.build_absolute_uri('/api/v1/listings/'),
+            'bookings': request.build_absolute_uri('/api/v1/bookings/'),
+            'payments': request.build_absolute_uri('/api/v1/payments/'),
+            'documentation': request.build_absolute_uri('/swagger/'),
+        }
+    })
+
 class ListingViewSet(viewsets.ModelViewSet):
     queryset = Listing.objects.all()
     serializer_class = ListingSerializer
+    permission_classes = [permissions.AllowAny]  # Allow public access
 
 class BookingViewSet(viewsets.ModelViewSet):
     queryset = Booking.objects.all()
     serializer_class = BookingSerializer
+    permission_classes = [permissions.AllowAny]  # Allow public access for demo
     
     def create(self, request, *args, **kwargs):
         """Override create method to send booking confirmation email"""
@@ -45,6 +62,7 @@ class BookingViewSet(viewsets.ModelViewSet):
 class PaymentViewSet(viewsets.ModelViewSet):
     queryset = Payment.objects.all()
     serializer_class = PaymentSerializer
+    permission_classes = [permissions.AllowAny]  # Allow public access for demo
 
     @action(detail=False, methods=['post'])
     def initiate(self, request):
